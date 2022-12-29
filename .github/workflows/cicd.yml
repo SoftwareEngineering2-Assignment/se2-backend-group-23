@@ -25,7 +25,7 @@ jobs:
   cd:
 
     runs on: ubuntu-latest
-    need: ci
+    needs: ci
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: appleboy/ssh-action@master
