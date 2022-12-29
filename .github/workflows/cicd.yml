@@ -2,6 +2,15 @@ name: ci
 
 on: push
 
+
+env: 
+  SERVER_SECRET: ${{ secrets.SERVER_SECRET }} 
+  SERVER_URI: ${{ secrets.SERVER_URI }} 
+  SERVER_EMAIL: ${{ secrets.SERVER_EMAIL }} 
+  PLATFORM_URI: ${{ secrets.PLATFORM_URI }} 
+  MONGODB_URI: ${{ secrets.MONGODB_URI }} 
+  SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }} 
+  
 jobs: 
   ci: 
     runs-on: ubuntu-latest
@@ -13,3 +22,21 @@ jobs:
       - name: Run test
         run: npm test
       
+  cd:
+
+    runs on: ubuntu-latest
+    need: ci
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/se2/23/se2-backend
+            git reset --hard origin/main
+            git pull https://${{secrets.CLONE_TOKEN }}@github.com/SoftwareEngineering2-Assignment/se2-backend-group-23 main
+            bash -ci 'npm install'
+            bash -ci 'pm2 restart se2-backend-23'
