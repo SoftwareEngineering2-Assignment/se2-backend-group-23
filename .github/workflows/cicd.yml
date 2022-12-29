@@ -3,6 +3,7 @@ name: ci
 on: push
 
 
+
 env: 
   SERVER_SECRET: ${{ secrets.SERVER_SECRET }} 
   SERVER_URI: ${{ secrets.SERVER_URI }} 
