@@ -54,8 +54,8 @@ test("post /create-source returns correct response and status code when the sour
           name:'Source',
           type: 'stomp',
           url: 'ws://<DOMAIN>:<WEB_STOMP_PORT>/ws',
-          login:'vchanos',
-          passcode:'lightwood1',
+          login:'Test',
+          passcode:'Test',
           vhost:''
       }
   }
@@ -73,8 +73,8 @@ test("post /create-source returns correct response and status code when the sour
           name: SourceName,
           type: 'stomp',
           url: 'ws://<DOMAIN>:<WEB_STOMP_PORT>/ws',
-          login:'vchanos',
-          passcode:'lightwood1',
+          login:'Test',
+          passcode:'Test',
           vhost:''
       }
   }
