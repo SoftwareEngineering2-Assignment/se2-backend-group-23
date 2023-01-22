@@ -1,4 +1,5 @@
 //* eslint-disable import/no-unresolved */
+
 require('dotenv').config();
 
 const http = require('node:http');
@@ -12,6 +13,7 @@ const {mongoose} = require('../src/config');
 const Source = require('../src/models/source');
 const app = require('../src/index');
 const {jwtSign} = require('../src/utilities/authentication/helpers');
+const Dashboard = require('../src/models/dashboard');
 
 
 const authToken = {id: "63a1cd674211b05e99f5b7a2"};
@@ -22,11 +24,18 @@ test.before(async (t) => {
   t.context.server = http.createServer(app);
   t.context.prefixUrl = await listen(t.context.server);
   t.context.got = got.extend({http2: true, throwHttpErrors: false, responseType: 'json', prefixUrl: t.context.prefixUrl});
+
 });
+
+function errorFunction(err){
+  if(err) console.log(err);
+  console.log("Successful deletion");
+}
 
 test.after.always((t) => {
   t.context.server.close();
-   Source.deleteMany();
+  Source.deleteMany({}).then(errorFunction);
+  Dashboard.deleteMany({}).then(errorFunction);
 });
 
 
@@ -119,9 +128,8 @@ test("post  /delete-source returns correct response and status code when the sou
         id:NewSource._id,
       }
   }
-  console.log("==================="+ JSON.stringify(NewSource._id))
+
   const {body,statusCode} = await t.context.got.post(`sources/delete-source?token=${token}`,SourceToDelete);
-  console.log("==================="+ JSON.stringify(body))
   t.is(statusCode, 200);
   t.assert(body.success)
 
@@ -145,10 +153,101 @@ test("get /sources returns correct response and status code ", async (t) => {
 
   const token = jwtSign(authToken);
   const {body,statusCode} = await t.context.got(`sources/sources?token=${token}`);
-  console.log("==================="+ JSON.stringify(body.sources))
 
   t.is(statusCode, 200);
   t.assert(body.success);
   t.assert(body.sources);
   
+})
+
+//================================ Dashboards =============================
+test("get /dashboards returns correct response and status code ", async (t) => {
+
+  const token = jwtSign(authToken);
+  const {body,statusCode} = await t.context.got(`dashboards/dashboards?token=${token}`);
+  t.is(statusCode, 200);
+  t.assert(body.success);
+  t.assert(body.dashboards);
+
+})
+
+
+test("post /create-dashboard returns correct response and status code when the dashboard with this name doesn't exists", async (t) => {
+  
+  try{
+    Dashboard.findOneAndRemove({name:'DashboardName1'});
+  }
+  catch (e){
+    console.log(e);
+  }
+  
+  const token = jwtSign(authToken);
+  const newDashboard ={
+      json:{name: 'DashboardName1'}
+  }
+  const {body,statusCode} = await t.context.got.post(`dashboards/create-dashboard?token=${token}`,newDashboard);
+  
+  console.log(body);
+
+  t.is(statusCode, 200);
+  t.assert(body.success);
+})
+
+test("post /create-dashboard returns correct response and status code when the dashboard with this name exists", async (t) => {
+
+  try{
+    Dashboard.findOneAndRemove({owner: "63a1cd674211b05e99f5b7a2",
+                                name: "DashboardName6"});
+  }
+  catch (e){
+    console.log(e);
+  }
+
+  const token = jwtSign(authToken);
+
+  const newDashboard ={
+    json:{name: "DashboardName6"}
+  }
+  await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                   name: "DashboardName6"}).save();
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/create-dashboard?token=${token}`,newDashboard);
+
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'A dashboard with that name already exists.');
+})
+
+
+test("post  /delete-dashboard returns correct response and status code when the dashboard with this id does exists", async (t) => {
+  mongoose();
+  const token = jwtSign(authToken);
+  
+  newDashboard= await Dashboard({name: "DashboardToDelete", owner: '63a1cd674211b05e99f5b7a2'}).save();
+  
+  const newDashboard2 ={
+      json:{
+        id:newDashboard._id,
+      }
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/delete-dashboard?token=${token}`,newDashboard2);
+
+  t.is(statusCode, 200);
+  t.assert(body.success)
+
+})
+
+test("post /delete-dashboard returns correct response and status code when the dashboard with this id doesn't exists", async (t) => {
+
+  const token = jwtSign(authToken);
+  const newDashboard ={
+      json:{
+          id: 1
+      }
+  }
+  const {body,statusCode} = await t.context.got.post(`dashboards/delete-dashboard?token=${token}`,newDashboard);
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'The selected dashboard has not been found.');
 })
