@@ -1,3 +1,4 @@
+//This files has the code that maps the routes with the router
 const express = require('express');
 const users = require('./users');
 const sources = require('./sources');
