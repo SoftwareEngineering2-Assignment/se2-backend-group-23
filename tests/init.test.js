@@ -174,20 +174,12 @@ test("get /dashboards returns correct response and status code ", async (t) => {
 
 test("post /create-dashboard returns correct response and status code when the dashboard with this name doesn't exists", async (t) => {
   
-  try{
-    Dashboard.findOneAndRemove({name:'DashboardName1'});
-  }
-  catch (e){
-    console.log(e);
-  }
-  
   const token = jwtSign(authToken);
   const newDashboard ={
       json:{name: 'DashboardName1'}
   }
   const {body,statusCode} = await t.context.got.post(`dashboards/create-dashboard?token=${token}`,newDashboard);
   
-  console.log(body);
 
   t.is(statusCode, 200);
   t.assert(body.success);
@@ -195,23 +187,17 @@ test("post /create-dashboard returns correct response and status code when the d
 
 test("post /create-dashboard returns correct response and status code when the dashboard with this name exists", async (t) => {
 
-  try{
-    Dashboard.findOneAndRemove({owner: "63a1cd674211b05e99f5b7a2",
-                                name: "DashboardName6"});
-  }
-  catch (e){
-    console.log(e);
-  }
-
+  
   const token = jwtSign(authToken);
 
   const newDashboard ={
-    json:{name: "DashboardName6"}
+    json:{name: "DashboardName2"}
   }
   await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
-                   name: "DashboardName6"}).save();
+                   name: "DashboardName2"}).save();
 
   const {body,statusCode} = await t.context.got.post(`dashboards/create-dashboard?token=${token}`,newDashboard);
+
 
   t.is(statusCode, 200);
   t.is(body.status,409);
@@ -224,7 +210,7 @@ test("post  /delete-dashboard returns correct response and status code when the 
   const token = jwtSign(authToken);
   
   newDashboard= await Dashboard({name: "DashboardToDelete", owner: '63a1cd674211b05e99f5b7a2'}).save();
-  
+
   const newDashboard2 ={
       json:{
         id:newDashboard._id,
@@ -232,6 +218,7 @@ test("post  /delete-dashboard returns correct response and status code when the 
   }
 
   const {body,statusCode} = await t.context.got.post(`dashboards/delete-dashboard?token=${token}`,newDashboard2);
+
 
   t.is(statusCode, 200);
   t.assert(body.success)
@@ -250,4 +237,146 @@ test("post /delete-dashboard returns correct response and status code when the d
   t.is(statusCode, 200);
   t.is(body.status,409);
   t.is(body.message,'The selected dashboard has not been found.');
+})
+
+
+
+test("post /clone-dashboard returns correct response and status code when the dashboard with this name doesn't exists", async (t) => {
+  
+  const token = jwtSign(authToken);
+
+
+  existingDashboard = await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                                       name: "DashboardName3"}).save();
+
+  const clonePayload ={
+      json:{dashboardId: existingDashboard.id, name: 'DashboardName4'}
+  }
+  const {body,statusCode} = await t.context.got.post(`dashboards/clone-dashboard?token=${token}`,clonePayload);
+
+  t.is(statusCode, 200);
+  t.assert(body.success);
+})
+
+test("post /clone-dashboard returns correct response and status code when the dashboard with this name exists", async (t) => {
+
+  const token = jwtSign(authToken);
+
+  existingDashboard = await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                   name: "DashboardName5"}).save();
+
+  const clonePayload ={
+      json:{dashboardId: existingDashboard.id, name: 'DashboardName5'}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/clone-dashboard?token=${token}`,clonePayload);
+
+
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'A dashboard with that name already exists.');
+})
+
+test("post /save-dashboard returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
+  
+  const token = jwtSign(authToken);
+
+  const savePayload ={
+    json:{id: 2, layout: [], items: {}, nextId: 2}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/save-dashboard?token=${token}`,savePayload);
+  
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'The selected dashboard has not been found.');
+
+})
+
+test("post /save-dashboard returns correct response and status code when the dashboard with this id exists", async (t) => {
+
+  const token = jwtSign(authToken);
+
+  existingDashboard = await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                   name: "DashboardName6"}).save();
+
+  const savePayload ={
+    json:{id: existingDashboard.id, layout: [], items: {}, nextId: 2}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/save-dashboard?token=${token}`,savePayload);
+
+  t.is(statusCode, 200);
+  t.assert(body.success);
+})
+
+test("post /share-dashboard returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
+  
+  const token = jwtSign(authToken);
+
+  const sharePayload ={
+    json:{dashboardId: 3}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/share-dashboard?token=${token}`, sharePayload);
+  
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'The specified dashboard has not been found.');
+
+})
+
+test("post /share-dashboard returns correct response and status code when the dashboard with this id exists", async (t) => {
+
+  const token = jwtSign(authToken);
+
+  existingDashboard = await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                   name: "DashboardName7"}).save();
+
+  const sharePayload ={
+    json:{dashboardId: existingDashboard.id}
+  }
+
+  const {body: b1, statusCode: sc1} = await t.context.got.post(`dashboards/share-dashboard?token=${token}`, sharePayload);
+  const {body: b2, statusCode: sc2} = await t.context.got.post(`dashboards/share-dashboard?token=${token}`, sharePayload);
+
+  t.is(sc1, 200);
+  t.assert(b1.success);
+  t.assert(b1.shared);
+  t.is(sc2, 200);
+  t.assert(b2.success);
+  t.assert(!b2.shared);
+})
+
+test("post /dashboards/change-password returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
+  
+  const token = jwtSign(authToken);
+
+  const passwordPayload ={
+    json:{dashboardId: 4, password: "1"}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/change-password?token=${token}`, passwordPayload);
+  
+  t.is(statusCode, 200);
+  t.is(body.status,409);
+  t.is(body.message,'The specified dashboard has not been found.');
+
+})
+
+test("post /dashboards/change-password returns correct response and status code when the dashboard with this id exists", async (t) => {
+
+  const token = jwtSign(authToken);
+
+  existingDashboard = await Dashboard({owner: "63a1cd674211b05e99f5b7a2",
+                                       name: "DashboardName8"}).save();
+
+  const passwordPayload ={
+    json:{dashboardId: existingDashboard.id, password: "1"}
+  }
+
+  const {body,statusCode} = await t.context.got.post(`dashboards/change-password?token=${token}`, passwordPayload);
+
+  t.is(statusCode, 200);
+  t.assert(body.success);
 })
