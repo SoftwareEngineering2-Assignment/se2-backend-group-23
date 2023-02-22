@@ -1,3 +1,4 @@
+//This file is used to determine the schemas of the parameters required for the registration
 const {isNil} = require('ramda');
 
 const yup = require('yup');
