@@ -1,3 +1,4 @@
+// This file has the code that handles the base route
 const express = require('express');
 const path = require('path');
 

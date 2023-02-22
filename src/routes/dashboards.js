@@ -1,4 +1,6 @@
 /* eslint-disable max-len */
+
+//This file has the code that handles the http requests for dashboards
 const express = require('express');
 const mongoose = require('mongoose');
 const {authorization} = require('../middlewares');
@@ -8,6 +10,7 @@ const router = express.Router();
 const Dashboard = require('../models/dashboard');
 const Source = require('../models/source');
 
+//Request for getting the dashboards stored in database
 router.get('/dashboards',
   authorization,
   async (req, res, next) => {
@@ -32,6 +35,7 @@ router.get('/dashboards',
     }
   });
 
+  //Request for creating a new dashboard
 router.post('/create-dashboard', 
   authorization,
   async (req, res, next) => {
@@ -59,6 +63,7 @@ router.post('/create-dashboard',
     }
   }); 
 
+//Request for deleting a dashboard that is stored in the database
 router.post('/delete-dashboard', 
   authorization,
   async (req, res, next) => {
@@ -78,6 +83,7 @@ router.post('/delete-dashboard',
     }
   }); 
 
+  //Request for getting a particular dashboard that is stored in the database
 router.get('/dashboard',
   authorization,
   async (req, res, next) => {
@@ -115,6 +121,8 @@ router.get('/dashboard',
     }
   });
 
+
+  //Request for saving a dashboard 
 router.post('/save-dashboard', 
   authorization,
   async (req, res, next) => {
@@ -141,6 +149,7 @@ router.post('/save-dashboard',
     }
   }); 
 
+  //Request for cloning a dashboard
 router.post('/clone-dashboard', 
   authorization,
   async (req, res, next) => {
@@ -171,6 +180,7 @@ router.post('/clone-dashboard',
     }
   }); 
 
+//Request for checking if the dashboard needs a password to be provided
 router.post('/check-password-needed', 
   async (req, res, next) => {
     try {
@@ -232,6 +242,7 @@ router.post('/check-password-needed',
     }
   }); 
 
+  //Request for checking the password
 router.post('/check-password', 
   async (req, res, next) => {
     try {
@@ -270,6 +281,7 @@ router.post('/check-password',
     }
   }); 
 
+  //Request for sharing a dashboard
 router.post('/share-dashboard', 
   authorization,
   async (req, res, next) => {
@@ -297,6 +309,7 @@ router.post('/share-dashboard',
     }
   }); 
 
+// Request for changing the password of a dashboard that is to be shared
 router.post('/change-password', 
   authorization,
   async (req, res, next) => {

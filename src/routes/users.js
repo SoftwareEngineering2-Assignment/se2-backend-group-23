@@ -1,3 +1,4 @@
+// This file has the code that handles the http requests for the users
 const express = require('express');
 const {validation, authorization} = require('../middlewares');
 const {helpers: {jwtSign}} = require('../utilities/authentication');
@@ -9,6 +10,7 @@ const router = express.Router();
 const User = require('../models/user');
 const Reset = require('../models/reset');
 
+//Request for adding a user
 router.post('/create',
   (req, res, next) => validation(req, res, next, 'register'),
   async (req, res, next) => {
@@ -32,6 +34,7 @@ router.post('/create',
     }
   });
 
+  // Request for checking the credentials of the user logging in
 router.post('/authenticate',
   (req, res, next) => validation(req, res, next, 'authenticate'),
   async (req, res, next) => {
@@ -63,6 +66,7 @@ router.post('/authenticate',
     }
   });
 
+// Request for resetting a user's password
 router.post('/resetpassword',
   (req, res, next) => validation(req, res, next, 'request'),
   async (req, res, next) => {
@@ -93,6 +97,7 @@ router.post('/resetpassword',
     }
   });
 
+  // Request for changing a user's password
 router.post('/changepassword',
   (req, res, next) => validation(req, res, next, 'change'),
   authorization,

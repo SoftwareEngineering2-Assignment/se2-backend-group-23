@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+//This file has the code that handles the http requests for sources
 const express = require('express');
 const mongoose = require('mongoose');
 const {authorization} = require('../middlewares');
@@ -7,6 +8,7 @@ const router = express.Router();
 
 const Source = require('../models/source');
 
+// Request for getting the sources stored in the database
 router.get('/sources',
   authorization,
   async (req, res, next) => {
@@ -36,6 +38,7 @@ router.get('/sources',
     }
   });
 
+  // Request for creating a new source
 router.post('/create-source', 
   authorization,
   async (req, res, next) => {
@@ -65,6 +68,7 @@ router.post('/create-source',
     }
   }); 
 
+  // Request for editing a source stored in the database
 router.post('/change-source', 
   authorization,
   async (req, res, next) => {
@@ -100,6 +104,7 @@ router.post('/change-source',
     }
   }); 
 
+  // Request for deleting a source
 router.post('/delete-source', 
   authorization,
   async (req, res, next) => {
@@ -118,6 +123,7 @@ router.post('/delete-source',
       return next(err.body);
     }
   }); 
+
 
 router.post('/source',
   async (req, res, next) => {
@@ -148,6 +154,7 @@ router.post('/source',
     }
   });
 
+  // Request for checking if the sources exist in the database and if not it adds them
 router.post('/check-sources',
   authorization,
   async (req, res, next) => {
