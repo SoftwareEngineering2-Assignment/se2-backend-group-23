@@ -32,6 +32,7 @@ function errorFunction(err){
   console.log("Successful deletion");
 }
 
+//After all the tests have been executed we delete all the sources and dashboards we created for the tests.
 test.after.always((t) => {
   t.context.server.close();
   Source.deleteMany({}).then(errorFunction);
@@ -48,6 +49,7 @@ test('GET /statistics returns correct response and status code', async (t) => {
 
 //================================Sources=============================
 
+//We see if we can create a source with a name that doesn't exist in the database.
 test("post /create-source returns correct response and status code when the source with this name doesn't exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -65,6 +67,8 @@ test("post /create-source returns correct response and status code when the sour
   t.is(statusCode, 200);
   t.assert(body.success);
 })
+
+//We see if we get an error response if we try to create a source with a name that already exists.
 test("post /create-source returns correct response and status code when the source with this name exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -85,7 +89,7 @@ test("post /create-source returns correct response and status code when the sour
 })
 
 
-
+//We see if we get an error response by trying to change a source with an id that doesn't exist.
 test("post /change-source returns correct response and status code when the source with this id doesn't exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -100,6 +104,7 @@ test("post /change-source returns correct response and status code when the sour
   t.is(body.message,'The selected source has not been found.');
 })
 
+//We see if we get the right response by trying to change a source with an id that does exist.
 test("post /change-source returns correct response and status code when the source with this id does exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -117,6 +122,7 @@ test("post /change-source returns correct response and status code when the sour
   t.assert(body.success)
 })
 
+//We see if we get the right response by trying to delete a source with an id that does exist.
 test("post  /delete-source returns correct response and status code when the source with this id does exists", async (t) => {
   mongoose();
   const token = jwtSign(authToken);
@@ -135,6 +141,7 @@ test("post  /delete-source returns correct response and status code when the sou
 
 })
 
+//We see if we get an error response by trying to delete a source with an id that doesn't exist.
 test("post /delete-source returns correct response and status code when the source with this id doesn't exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -149,6 +156,7 @@ test("post /delete-source returns correct response and status code when the sour
   t.is(body.message,'The selected source has not been found.');
 })
 
+//We see if we get all the sources that exist to the database of this account.
 test("get /sources returns correct response and status code ", async (t) => {
 
   const token = jwtSign(authToken);
@@ -161,6 +169,8 @@ test("get /sources returns correct response and status code ", async (t) => {
 })
 
 //================================ Dashboards =============================
+
+//We see if we get all the dashboards that exist to the database of this account.
 test("get /dashboards returns correct response and status code ", async (t) => {
 
   const token = jwtSign(authToken);
@@ -171,7 +181,7 @@ test("get /dashboards returns correct response and status code ", async (t) => {
 
 })
 
-
+//We see if we can create a dashboard with a name that doesn't exist in the database.
 test("post /create-dashboard returns correct response and status code when the dashboard with this name doesn't exists", async (t) => {
   
   const token = jwtSign(authToken);
@@ -185,6 +195,7 @@ test("post /create-dashboard returns correct response and status code when the d
   t.assert(body.success);
 })
 
+//We see if we can create a dashboard with a name that does exist in the database.
 test("post /create-dashboard returns correct response and status code when the dashboard with this name exists", async (t) => {
 
   
@@ -204,7 +215,7 @@ test("post /create-dashboard returns correct response and status code when the d
   t.is(body.message,'A dashboard with that name already exists.');
 })
 
-
+//We see if we can delete a dashboard with an id that does exist in the database.
 test("post  /delete-dashboard returns correct response and status code when the dashboard with this id does exists", async (t) => {
   mongoose();
   const token = jwtSign(authToken);
@@ -225,6 +236,7 @@ test("post  /delete-dashboard returns correct response and status code when the 
 
 })
 
+//We see if we can delete a dashboard with an id that doesn't exist in the database.
 test("post /delete-dashboard returns correct response and status code when the dashboard with this id doesn't exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -240,7 +252,7 @@ test("post /delete-dashboard returns correct response and status code when the d
 })
 
 
-
+//We see if we can clone a dashboard and putting an name that doesn't exist in the database.
 test("post /clone-dashboard returns correct response and status code when the dashboard with this name doesn't exists", async (t) => {
   
   const token = jwtSign(authToken);
@@ -258,6 +270,7 @@ test("post /clone-dashboard returns correct response and status code when the da
   t.assert(body.success);
 })
 
+//We see if we can clone a dashboard and putting an name that does exist in the database.
 test("post /clone-dashboard returns correct response and status code when the dashboard with this name exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -277,6 +290,7 @@ test("post /clone-dashboard returns correct response and status code when the da
   t.is(body.message,'A dashboard with that name already exists.');
 })
 
+//We see if we can save a dashboard with an id that doesn't exist in the database.
 test("post /save-dashboard returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
   
   const token = jwtSign(authToken);
@@ -293,6 +307,7 @@ test("post /save-dashboard returns correct response and status code when the das
 
 })
 
+//We see if we can save a dashboard with an id that does exist in the database.
 test("post /save-dashboard returns correct response and status code when the dashboard with this id exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -310,6 +325,7 @@ test("post /save-dashboard returns correct response and status code when the das
   t.assert(body.success);
 })
 
+//We see if we can share a dashboard with an id that doesn't exist in the database.
 test("post /share-dashboard returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
   
   const token = jwtSign(authToken);
@@ -326,6 +342,7 @@ test("post /share-dashboard returns correct response and status code when the da
 
 })
 
+//We see if we can share a dashboard with an id that does exist in the database.
 test("post /share-dashboard returns correct response and status code when the dashboard with this id exists", async (t) => {
 
   const token = jwtSign(authToken);
@@ -348,6 +365,7 @@ test("post /share-dashboard returns correct response and status code when the da
   t.assert(!b2.shared);
 })
 
+//We see if we can change the password of a dashboard with an id that doesn't exist in the database.
 test("post /dashboards/change-password returns correct response and status code when the dashboard with this id doesn't exist", async (t) => {
   
   const token = jwtSign(authToken);
@@ -364,6 +382,7 @@ test("post /dashboards/change-password returns correct response and status code 
 
 })
 
+//We see if we can change the password of a dashboard with an id that does exist in the database.
 test("post /dashboards/change-password returns correct response and status code when the dashboard with this id exists", async (t) => {
 
   const token = jwtSign(authToken);
